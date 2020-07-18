@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restful import Api
-from resource.planets import Planets, Planet, FindByName
-
+from resource.planets import Planets, Planet, GetPlanetsByName
+from resource.user import User
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,7 +16,8 @@ def create_db():
 
 api.add_resource(Planets, '/api/av1/planets/')
 api.add_resource(Planet, '/api/av1/planet/<int:planet_id>/')
-api.add_resource(FindByName, '/api/av1/planet/name/<string:name>/')
+api.add_resource(GetPlanetsByName, '/api/av1/planet/name/<string:name>/')
+api.add_resource(User, '/')
 
 if __name__ == '__main__':
     from database.db import database

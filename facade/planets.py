@@ -25,9 +25,10 @@ class PlanetFacade:
         return None
 
     @classmethod
-    def save_planet(cls, data, planet_id, films_appear):
-        if PlanetFacade.find_planet_by_id(planet_id):
-            return None
+    def save_planet(cls, data, planet_id):
+        planet = PlanetFacade.find_planet_by_id(planet_id)
+        if planet:
+            return planet.name
         planet_saved = PlanetModel(planet_id, **data)
         planet_saved.save()
         if planet_saved:
@@ -40,6 +41,7 @@ class PlanetFacade:
         if planet_result:
             planet_updated = planet_result.update(**data)
             return planet_updated
+        cls.save_planet(data, planet_id)
 
     @classmethod
     def delete_planet(cls, planet_id):

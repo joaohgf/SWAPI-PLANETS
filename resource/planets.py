@@ -3,34 +3,40 @@ from facade.planets import PlanetFacade
 
 
 class Planets(Resource):
-    def get(self):
+    @staticmethod
+    def get():
         planet_list = []
         planets = PlanetFacade.get_all_planets()
-        for planet in planets:
-            planet_list.append(planet.parse_json())
-        return planet_list
+        if planets:
+            for planet in planets:
+                planet_list.append(planet.parse_json())
+            if planet_list:
+                return planet_list
+        return "Doesn't exist any planet! Please, create!"
 
 
 class Planet(Resource):
-
     args = reqparse.RequestParser()
-    args.add_argument("name")
-    args.add_argument("climate")
-    args.add_argument("terrain")
+    args.add_argument(
+        "name", type=str, required=True, help="Missing name")
+    args.add_argument(
+        "climate", type=str, required=True, help="Missing climate")
+    args.add_argument(
+        "terrain", type=str, required=True, help="Missing terrain")
 
-    def get(self, planet_id):
+    @staticmethod
+    def get(planet_id):
         planet = PlanetFacade.find_planet_by_id(planet_id)
         if planet:
             return planet.parse_json(), 200
-        else:
-            return f"Not found", 404
 
-    def post(self, planet_id):
+    @staticmethod
+    def post(planet_id):
         data = Planet.args.parse_args()
         planet = PlanetFacade.save_planet(data, planet_id)
         if planet:
-            return f"Planet {planet_id} was created successfully", 201
-        return f"Error: Planet {planet_id} exists."
+            return f"Planet {planet.name} was created successfully", 201
+        return f"The {planet_id} was created before", 200
 
     def put(self, planet_id):
         data = self.args.parse_args()
@@ -38,14 +44,18 @@ class Planet(Resource):
         if planet_updated:
             return planet_updated.parse_json(), 200
 
-    def delete(self, planet_id):
+    @staticmethod
+    def delete(planet_id):
         planet_delete = PlanetFacade.delete_planet(planet_id)
         if planet_delete:
-            return "Deleted"
+            return f"The {planet_delete} was deleted"
+        return "Doesn't exist"
 
 
-class FindByName(Resource):
+class GetPlanetsByName(Resource):
 
-    def get(self, name):
+    @staticmethod
+    def get(name):
         planet = PlanetFacade.find_planet_by_name(name)
         return planet.parse_json(), 200
+
