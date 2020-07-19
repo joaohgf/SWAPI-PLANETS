@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_raw_jwt
 from werkzeug.security import safe_str_cmp
 from BLACKLIST import BLACKLIST
 
+
 args = reqparse.RequestParser()
 args.add_argument(
     "login", type=str, required=True, help="Missing login")

@@ -1,6 +1,8 @@
 from flask_restful import Resource, reqparse
 from controller.planets import PlanetController
 from flask_jwt_extended import jwt_required
+import requests
+import json
 
 
 class Planets(Resource):
@@ -34,7 +36,9 @@ class Planet(Resource):
     @jwt_required
     def put(self, planet_id):
         data = self.args.parse_args()
-        planet_updated = PlanetController.update_planet(data, planet_id)
+        films_appear = get_films(data["name"])
+        planet_updated = PlanetController.update_planet(
+            data, planet_id, films_appear)
         if planet_updated:
             return planet_updated.parse_json(), 200
 
@@ -59,7 +63,20 @@ class CreatePlanet(Resource):
     @jwt_required
     def post(self):
         data = Planet.args.parse_args()
-        planet = PlanetController.save_planet(data)
+        films_appear = get_films(data["name"])
+        planet = PlanetController.save_planet(data, films_appear)
         if planet:
             return f"Planet {data['name']} was created successfully", 201
         return f"The {data['name']} was created before"
+
+
+def get_films(name):
+    path = "https://swapi.dev/api/planets/?search=" + name
+    try:
+        req = requests.get(path)
+    except Exception as error:
+        return f"Error making request to S.W.A.P.I {error}"
+    json_result = json.loads(req.text)
+    if json_result["count"] > 0:
+        return len(json_result["results"][0]["films"])
+    return 0

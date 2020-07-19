@@ -1,6 +1,4 @@
 from database.db import database
-import requests
-import json
 
 
 class PlanetModel(database.Model):
@@ -12,23 +10,11 @@ class PlanetModel(database.Model):
     terrain = database.Column(database.String(80))
     films_appear = database.Column(database.Integer)
 
-    def __init__(self, name, climate, terrain):
+    def __init__(self, name, climate, terrain, films_appear):
         self.name = name
         self.climate = climate
         self.terrain = terrain
-        self.films_appear = PlanetModel.get_films(name)
-
-    @staticmethod
-    def get_films(name):
-        path = "https://swapi.dev/api/planets/?search=" + name
-        try:
-            req = requests.get(path)
-        except Exception as error:
-            return f"Error making request to S.W.A.P.I {error}"
-        json_result = json.loads(req.text)
-        if json_result["count"] > 0:
-            return len(json_result["results"][0]["films"])
-        return 0
+        self.films_appear = films_appear
 
     def parse_json(self):
         return {
