@@ -12,8 +12,7 @@ class PlanetModel(database.Model):
     terrain = database.Column(database.String(80))
     films_appear = database.Column(database.Integer)
 
-    def __init__(self, planet_id, name, climate, terrain):
-        self.planet_id = planet_id
+    def __init__(self, name, climate, terrain):
         self.name = name
         self.climate = climate
         self.terrain = terrain

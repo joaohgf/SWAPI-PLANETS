@@ -1,26 +1,36 @@
-from flask import Flask
+from flask import jsonify
+from BLACKLIST import BLACKLIST
+from resource.planets import Planets, Planet, GetPlanetsByName, CreatePlanet
+from resource.user import User, CreateUser, Login, Logout
+from flask_jwt_extended import JWTManager
+from init import create_app
 from flask_restful import Api
-from resource.planets import Planets, Planet, GetPlanetsByName
-from resource.user import User
 
-app = Flask(__name__)
+
+app = create_app()
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SQLAlchemy_TRACK_MODIFICATIONS'] = False
+jwt = JWTManager(app)
 
 
-@app.before_first_request
-def create_db():
-    database.create_all()
+@jwt.token_in_blacklist_loader
+def verify_blacklist(token):
+    return token['jti'] in BLACKLIST
 
 
-api.add_resource(Planets, '/api/av1/planets/')
+@jwt.revoked_token_loader
+def access_token_invalid():
+    return jsonify({"message": "You're logged out"})
+
+
+api.add_resource(CreatePlanet, '/api/av1/planet/create/')
 api.add_resource(Planet, '/api/av1/planet/<int:planet_id>/')
 api.add_resource(GetPlanetsByName, '/api/av1/planet/name/<string:name>/')
-api.add_resource(User, '/')
+api.add_resource(Planets, '/api/av1/planets/')
+api.add_resource(CreateUser, '/api/av1/user/create/')
+api.add_resource(Login, '/api/av1/user/login/')
+api.add_resource(User, '/api/av1/user/<int:user_id>/')
+api.add_resource(Logout, '/api/av1/user/logout/')
+
 
 if __name__ == '__main__':
-    from database.db import database
-
-    database.init_app(app)
     app.run(debug=True)

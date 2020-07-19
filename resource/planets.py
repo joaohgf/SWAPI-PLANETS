@@ -1,17 +1,18 @@
 from flask_restful import Resource, reqparse
-from facade.planets import PlanetFacade
+from controller.planets import PlanetController
+from flask_jwt_extended import jwt_required
 
 
 class Planets(Resource):
     @staticmethod
     def get():
         planet_list = []
-        planets = PlanetFacade.get_all_planets()
+        planets = PlanetController.get_all_planets()
         if planets:
             for planet in planets:
                 planet_list.append(planet.parse_json())
             if planet_list:
-                return planet_list
+                return {"Planets": planet_list}
         return "Doesn't exist any planet! Please, create!"
 
 
@@ -26,29 +27,22 @@ class Planet(Resource):
 
     @staticmethod
     def get(planet_id):
-        planet = PlanetFacade.find_planet_by_id(planet_id)
+        planet = PlanetController.find_planet_by_id(planet_id)
         if planet:
             return planet.parse_json(), 200
 
-    @staticmethod
-    def post(planet_id):
-        data = Planet.args.parse_args()
-        planet = PlanetFacade.save_planet(data, planet_id)
-        if planet:
-            return f"Planet {planet.name} was created successfully", 201
-        return f"The {planet_id} was created before", 200
-
+    @jwt_required
     def put(self, planet_id):
         data = self.args.parse_args()
-        planet_updated = PlanetFacade.update_planet(data, planet_id)
+        planet_updated = PlanetController.update_planet(data, planet_id)
         if planet_updated:
             return planet_updated.parse_json(), 200
 
-    @staticmethod
-    def delete(planet_id):
-        planet_delete = PlanetFacade.delete_planet(planet_id)
+    @jwt_required
+    def delete(self, planet_id):
+        planet_delete = PlanetController.delete_planet(planet_id)
         if planet_delete:
-            return f"The {planet_delete} was deleted"
+            return f"The {planet_delete} was deleted", 200
         return "Doesn't exist"
 
 
@@ -56,6 +50,16 @@ class GetPlanetsByName(Resource):
 
     @staticmethod
     def get(name):
-        planet = PlanetFacade.find_planet_by_name(name)
+        planet = PlanetController.find_planet_by_name(name)
         return planet.parse_json(), 200
 
+
+class CreatePlanet(Resource):
+
+    @jwt_required
+    def post(self):
+        data = Planet.args.parse_args()
+        planet = PlanetController.save_planet(data)
+        if planet:
+            return f"Planet {data['name']} was created successfully", 201
+        return f"The {data['name']} was created before"

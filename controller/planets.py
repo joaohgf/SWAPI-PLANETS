@@ -1,9 +1,9 @@
 from models.planets import PlanetModel
 
 
-class PlanetFacade:
+class PlanetController:
     def __init__(self):
-        self.planet_facade = PlanetFacade()
+        self.planet_controller = PlanetController()
 
     @classmethod
     def find_planet_by_id(cls, planet_id):
@@ -25,27 +25,27 @@ class PlanetFacade:
         return None
 
     @classmethod
-    def save_planet(cls, data, planet_id):
-        planet = PlanetFacade.find_planet_by_id(planet_id)
+    def save_planet(cls, data):
+        planet = cls.find_planet_by_name(str(data["name"]))
         if planet:
             return planet.name
-        planet_saved = PlanetModel(planet_id, **data)
-        planet_saved.save()
+        planet_object = PlanetModel(**data)
+        planet_saved = PlanetModel.save(planet_object)
         if planet_saved:
             return planet_saved
         return None
 
     @classmethod
     def update_planet(cls, data, planet_id):
-        planet_result = PlanetFacade.find_planet_by_id(planet_id)
+        planet_result = cls.find_planet_by_id(planet_id)
         if planet_result:
             planet_updated = planet_result.update(**data)
             return planet_updated
-        cls.save_planet(data, planet_id)
+        cls.save_planet(data)
 
     @classmethod
     def delete_planet(cls, planet_id):
-        planet_result = PlanetFacade.find_planet_by_id(planet_id)
+        planet_result = cls.find_planet_by_id(planet_id)
         if planet_result:
             return planet_result.delete()
 

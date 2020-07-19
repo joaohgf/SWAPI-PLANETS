@@ -1,7 +1,7 @@
 from database.db import database
 
 
-class User(database.Model):
+class UserModel(database.Model):
     __tablename__ = "user"
 
     user_id = database.Column(database.Integer, primary_key=True)
@@ -29,12 +29,24 @@ class User(database.Model):
                 return user
             return None
 
+    @classmethod
+    def find_user_by_login(cls, login):
+        if login:
+            try:
+                user = cls.query.filter_by(login=login).first()
+            except Exception as error:
+                return f"Error getting by id: {error}"
+            if user:
+                return user
+            return None
+
     def save(self):
         try:
             database.session.add(self)
             database.session.commit()
         except Exception as error:
             return f"Error saving {error}"
+        return self
 
     def delete(self):
         try:
@@ -42,4 +54,4 @@ class User(database.Model):
             database.session.commit()
         except Exception as error:
             return f"Error deleting{error}"
-        return self.name
+        return self
