@@ -4,7 +4,7 @@ services:
         container_name: b2w_app
         build: .
         ports:
-            - "8080:8080"
+            - "5000:5000"
         volumes:
             - .:/app
         depends_on:
@@ -13,14 +13,17 @@ services:
           - b2w_network
 
     b2w_db:
-        image: mysql
+        image: postgres
         container_name: b2w_db
         volumes:
         - /app/database
         ports:
-          - "5000:5000"
+          - "5432:5432"
         networks:
             - b2w_network
+        environment:
+            POSTGRES_USERNAME: postgres
+            POSTGRES_PASSWORD: admin
 networks:
   b2w_network:
       driver: bridge
