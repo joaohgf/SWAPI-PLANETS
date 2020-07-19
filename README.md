@@ -14,6 +14,11 @@ Após isso é preciso setar 'FLASK_ENV':
 ```sh
 $ export FLASK_ENV=development
 ```
+#### Para rodar a aplicação:
+```sh
+$ flask run
+```
+
 
 #### Para consultar todos planetas criados é necessário fazer um GET na rota '/api/av1/planets/':
 
