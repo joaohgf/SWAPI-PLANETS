@@ -38,8 +38,6 @@ class CreateUser(Resource):
         user = UserController.post(data)
         if user:
             return user.parse_json(), 201
-        # TODO arrumar esse error
-        return ""
 
 
 class Login(Resource):

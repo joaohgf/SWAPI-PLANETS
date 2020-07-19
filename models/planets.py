@@ -10,11 +10,11 @@ class PlanetModel(database.Model):
     terrain = database.Column(database.String(80))
     films_appear = database.Column(database.Integer)
 
-    def __init__(self, name, climate, terrain, films_appear):
+    def __init__(self, films_appear, name, climate, terrain):
+        self.films_appear = films_appear
         self.name = name
         self.climate = climate
         self.terrain = terrain
-        self.films_appear = films_appear
 
     def parse_json(self):
         return {
@@ -60,14 +60,15 @@ class PlanetModel(database.Model):
         try:
             database.session.add(self)
             database.session.commit()
+            return "Created"
         except Exception as error:
             return f"Error saving {error}"
 
-    def update(self, name, climate, terrain):
-        self.name = name
-        self.climate = climate
-        self.terrain = terrain
-        self.films_appear = PlanetModel.get_films(name)
+    def update(self, **data):
+        self.name = data["name"]
+        self.climate = data["climate"]
+        self.terrain = data["terrain"]
+        self.films_appear = data["films_appear"]
         try:
             self.save()
         except Exception as error:
